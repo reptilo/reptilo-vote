@@ -1,0 +1,13 @@
+#reptilo-vote {float: left;background-color: #F6F5F4;color: #93999D;margin: 10px 0 9px;padding: 20px;width: 600px;}
+#reptilo-vote .vote {margin: 0;width: 360px;float: left;}
+#reptilo-vote .grade {float: right;font-size: 12px;line-height: 15px;padding: 0;width: 300px;}
+#reptilo-vote .vote p.votes {float: left;font-size: 24px;font-weight: 700;width: 60px;}
+#reptilo-vote .vote p.votes .no{color: #B74242;}
+#reptilo-vote .vote a.no:hover{color: #8E3232;}
+#reptilo-vote .vote a.yes:hover{color: #5e7c30;}
+#reptilo-vote .grade .large {float: left;color: #BECBAC;font-family: helvetica,arial;font-size: 62px;font-weight: 700;line-height: 65px;margin: -8px 10px 0 0;text-align: right;width: 150px;}
+#reptilo-vote .vote .votes a {color: #83A20F;cursor: pointer;text-decoration: none;width: 50px;}
+#reptilo-vote .vote p.voted .vote {color: #BBBEC0;cursor: default;}
+
+
+

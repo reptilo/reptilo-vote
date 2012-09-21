@@ -24,7 +24,6 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 class ReptiloVote {
 
   public $postId;
@@ -63,7 +62,7 @@ class ReptiloVote {
   }
 
   /**
-   * Jquery action
+   * jQuery action
    * Update the number of yes or no votes and total, calculate a new percent
    * return/print results as json array
    * Updates also the stats.
@@ -141,7 +140,7 @@ class ReptiloVote {
   public function includeCode() {
     $pluginRoot = plugins_url("", __FILE__);
     $actionFile = $pluginRoot . "/api/vote.php";
-    echo '<script type="text/javascript">
+    $code = '<script type="text/javascript">
   jQuery(document).ready(function(){
     jQuery("a.vote").click(function(event) {
       event.preventDefault();
@@ -167,8 +166,8 @@ class ReptiloVote {
               jQuery("span.large").html(data.percent + "%");
               jQuery("a.yes").attr("title", data.yes + " (av " + data.total + ")");
               jQuery("a.no").attr("title", data.no + " (av " + data.total + ")");
-              jQuery("a.yes").removeAttr("href");
-              jQuery("a.no").removeAttr("href");
+              jQuery("#reptilo-vote .vote p.votes a.yes").removeAttr("href");
+              jQuery("#reptilo-vote .vote p.votes a.no").removeAttr("href");
             }
           });
         }
@@ -178,31 +177,38 @@ class ReptiloVote {
   });
 </script>';
 
-    echo
-    '<div class="vote">
-    <p>Var den här informationen till hjälp?</p>
-    <div class="grade">
-      <span class="large">' . $this->percent . '%</span>
-      tycker att denna information var hjälpsam
-    </div>
-    <p class="votes">
-      <a class="vote yes" title="' . $this->yes . ' (av ' . $this->total . ')" href="#" tabindex="2">Ja</a>
-      <a class="vote no" title="' . $this->no . ' (av ' . $this->total . ')" href="#" tabindex="2">Nej</a>
-    </p>
+    
+    $code .= '<div style="clear:both;"></div>
+    <div id="reptilo-vote">
+      <div class="vote">
+        <p>Var den här informationen till hjälp?</p>
+        <div class="grade">
+          <span class="large">' . $this->percent . '%</span>
+          tycker att denna information var hjälpsam
+        </div>
+        <p class="votes">
+          <a class="vote yes" title="' . $this->yes . ' (av ' . $this->total . ')" href="#" tabindex="2">Ja</a>
+          <a class="vote no" title="' . $this->no . ' (av ' . $this->total . ')" href="#" tabindex="2">Nej</a>
+        </p>
+     </div>
   </div>';
-  }
-
+    
+  return $code;  
+  } 
 }
 
 
 
 /**
- * Enqueue some java scripts
+ * Enqueue jQuery och CSS
  */
 function reptilo_load_scripts() {
   wp_deregister_script('jquery');
   wp_register_script('jquery', 'http://code.jquery.com/jquery-latest.min.js');
   wp_enqueue_script('jquery');
+  
+  wp_register_style( 'vote-style', plugins_url('style.css', __FILE__) );  
+  wp_enqueue_style( 'vote-style' );      
 }
 add_action('wp_enqueue_scripts', 'reptilo_load_scripts');
 
@@ -216,6 +222,7 @@ add_action('wp_enqueue_scripts', 'reptilo_load_scripts');
  */
 function reptilo_display_vote( $atts ){
  $rv = new ReptiloVote();
- $rv->includeCode();
+ return $rv->includeCode();
 }
 add_shortcode( 'reptilo_vote', 'reptilo_display_vote' );
+
