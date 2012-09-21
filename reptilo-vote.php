@@ -3,8 +3,7 @@
 /**
   Plugin Name: Reptilo Vote
   Plugin URI: http://reptilo.se/plugins
-  Description: Grade a post if it is helpful or not with yes or no. Uses hidden postmeta fields for storage.
-               It also calculates statistics and store it in wp_options with key "reptiloVoteStats"
+  Description: Grade a post if it is helpful or not with yes or no. Uses hidden postmeta fields for storage. Use shortcode [reptilo-vote] in your post. It also calculates statistics and store it in wp_options with key "reptiloVoteStats"
   Version: 1.0
   Author: Kristian Erendi
   Author URI: http://reptilo.se
@@ -215,7 +214,7 @@ add_action('wp_enqueue_scripts', 'reptilo_load_scripts');
 
 
 /**
- * Shortcode for [reptilo_vote]
+ * Shortcode for [reptilo-vote]
  * 
  * @param type $atts
  * @return string 
@@ -224,5 +223,5 @@ function reptilo_display_vote( $atts ){
  $rv = new ReptiloVote();
  return $rv->includeCode();
 }
-add_shortcode( 'reptilo_vote', 'reptilo_display_vote' );
+add_shortcode( 'reptilo-vote', 'reptilo_display_vote' );
 
