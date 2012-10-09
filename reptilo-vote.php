@@ -2,16 +2,16 @@
 
 /**
   Plugin Name: Reptilo Vote
-  Plugin URI: http://reptilo.se/plugins
-  Description: Grade a post if it is helpful or not with yes or no. Uses hidden postmeta fields for storage. Use shortcode [reptilo-vote] in your post. It also calculates statistics and store it in wp_options with key "reptiloVoteStats"
+  Plugin URI: https://github.com/reptilo/reptilo-vote
+  Description: Ajax based voting utility for posts and pasges. Vote yes or no and the procentage will show. Use shortcode [reptilo-vote] in your post. Uses hidden postmeta fields for storage. It also calculates statistics and store it in wp_options with key "reptiloVoteStats"
   Version: 1.0
   Author: Kristian Erendi
   Author URI: http://reptilo.se
   License: GPL2
  */
-/*
+/* 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License, version 2, as
+  it under the terms of the GNU General Public License, version 2, as 
   published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -22,7 +22,7 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+*/
 class ReptiloVote {
 
   public $postId;
@@ -79,21 +79,16 @@ class ReptiloVote {
     $this->total = $this->total + 1;
     $percent = $this->yes / $this->total * 100;
     $this->percent = (int) $percent;
-
+    $this->calcStats();   //update the stats
+    
     $response = array(
+        'status' => 'ok',
         'percent' => $this->percent,
         'yes' => $this->yes,
         'no' => $this->no,
         'total' => $this->total
     );
-
-    //write it as json
-    header('Cache-Control: no-cache, must-revalidate');
-    header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-    header('Content-type: application/json');
-    echo json_encode($response);
-
-    $this->calcStats();   //update the stats
+    return $response;
   }
 
   
@@ -135,13 +130,21 @@ class ReptiloVote {
   
   /**
    * Print the javascript and HTLM code to the page
+   * All text strings are translateable
    */
   public function includeCode() {
+    $s1 = __("Is this information helpful?", 'reptilo-vote');
+    $s2 = __("Think that this information is helpful", 'reptilo-vote');
+    $s3 = __("of", 'reptilo-vote');
+    $s4 = __("Yes", 'reptilo-vote');
+    $s5 = __("No", 'reptilo-vote');
+        
     $pluginRoot = plugins_url("", __FILE__);
     $actionFile = $pluginRoot . "/api/vote.php";
     $code = '<script type="text/javascript">
-  jQuery(document).ready(function(){
-    jQuery("a.vote").click(function(event) {
+  var j$ = jQuery.noConflict();
+  j$(document).ready(function(){
+    j$("a.vote").click(function(event) {
       event.preventDefault();
       var self = jQuery(this);
       if(!self.parent().hasClass("voted")){  //continue only if no class "voted"
@@ -151,22 +154,21 @@ class ReptiloVote {
           answer = "no";
         }
         var dataString = "answer=" + answer + "&postid=" + ' . $this->postId . ';
-        //alert(dataString);
         if(dataString==""){
         } else{
-          jQuery.ajax({
+          j$.ajax({
             type: "POST",
             url: "' . $actionFile . '",
             data: dataString,
             cache: false,
             success: function(data){
               console.log(data);
-              jQuery("p.votes").addClass("voted");
-              jQuery("span.large").html(data.percent + "%");
-              jQuery("a.yes").attr("title", data.yes + " (av " + data.total + ")");
-              jQuery("a.no").attr("title", data.no + " (av " + data.total + ")");
-              jQuery("#reptilo-vote .vote p.votes a.yes").removeAttr("href");
-              jQuery("#reptilo-vote .vote p.votes a.no").removeAttr("href");
+              j$("p.votes").addClass("voted");
+              j$("span.large").html(data.percent + "%");
+              j$("a.yes").attr("title", data.yes + " ('.$s3.' " + data.total + ")");
+              j$("a.no").attr("title", data.no + " ('.$s3.' " + data.total + ")");
+              j$("#reptilo-vote .vote p.votes a.yes").removeAttr("href");
+              j$("#reptilo-vote .vote p.votes a.no").removeAttr("href");
             }
           });
         }
@@ -180,14 +182,14 @@ class ReptiloVote {
     $code .= '<div style="clear:both;"></div>
     <div id="reptilo-vote">
       <div class="vote">
-        <p>Var den här informationen till hjälp?</p>
+        <p>'.$s1.'</p>
         <div class="grade">
           <span class="large">' . $this->percent . '%</span>
-          tycker att denna information var hjälpsam
+          '.$s2.'
         </div>
         <p class="votes">
-          <a class="vote yes" title="' . $this->yes . ' (av ' . $this->total . ')" href="#" tabindex="2">Ja</a>
-          <a class="vote no" title="' . $this->no . ' (av ' . $this->total . ')" href="#" tabindex="2">Nej</a>
+          <a class="vote yes" title="' . $this->yes . ' ('.$s3.' ' . $this->total . ')" href="#" tabindex="2">'.$s4.'</a>
+          <a class="vote no" title="' . $this->no . ' ('.$s3.' ' . $this->total . ')" href="#" tabindex="2">'.$s5.'</a>
         </p>
      </div>
   </div>';
@@ -225,3 +227,8 @@ function reptilo_display_vote( $atts ){
 }
 add_shortcode( 'reptilo-vote', 'reptilo_display_vote' );
 
+
+/**
+ * enable language internationalization 
+ */
+load_plugin_textdomain('reptilo-vote', false, basename( dirname( __FILE__ ) ) . '/languages' );
