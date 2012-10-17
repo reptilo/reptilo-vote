@@ -9,9 +9,9 @@
   Author URI: http://reptilo.se
   License: GPL2
  */
-/* 
+/*
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License, version 2, as 
+  it under the terms of the GNU General Public License, version 2, as
   published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
@@ -22,7 +22,7 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
 class ReptiloVote {
 
   public $postId;
@@ -80,7 +80,7 @@ class ReptiloVote {
     $percent = $this->yes / $this->total * 100;
     $this->percent = (int) $percent;
     $this->calcStats();   //update the stats
-    
+
     $response = array(
         'status' => 'ok',
         'percent' => $this->percent,
@@ -91,7 +91,6 @@ class ReptiloVote {
     return $response;
   }
 
-  
   /**
    * Calculate statistics
    * Get data from the db, put it together and store it in wp_options with key "reptiloVoteStats"
@@ -117,7 +116,7 @@ class ReptiloVote {
     foreach ($resYesNo as $res) {
       $stats[$res->meta_key] = $res->votes;
     }
-    
+
     //store it to wp_options
     $statsWPOptions = get_option("reptiloVoteStats");
     if (empty($statsWPOptions)) {
@@ -127,7 +126,6 @@ class ReptiloVote {
     }
   }
 
-  
   /**
    * Print the javascript and HTLM code to the page
    * All text strings are translateable
@@ -138,9 +136,10 @@ class ReptiloVote {
     $s3 = __("of", 'reptilo-vote');
     $s4 = __("Yes", 'reptilo-vote');
     $s5 = __("No", 'reptilo-vote');
-        
+
     $pluginRoot = plugins_url("", __FILE__);
     $actionFile = $pluginRoot . "/api/vote.php";
+    $ajax_nonce = wp_create_nonce("reptilo-vote".$this->postId);
     $code = '<script type="text/javascript">
   var j$ = jQuery.noConflict();
   j$(document).ready(function(){
@@ -153,52 +152,52 @@ class ReptiloVote {
         } else {
           answer = "no";
         }
-        var dataString = "answer=" + answer + "&postid=" + ' . $this->postId . ';
-        if(dataString==""){
-        } else{
+	      var data = {
+            security: "' . $ajax_nonce . '",
+            answer: answer,
+            postid:"' . $this->postId . '"  
+	      };          
           j$.ajax({
             type: "POST",
             url: "' . $actionFile . '",
-            data: dataString,
+            data: data,
             cache: false,
             success: function(data){
               console.log(data);
               j$("p.votes").addClass("voted");
               j$("span.large").html(data.percent + "%");
-              j$("a.yes").attr("title", data.yes + " ('.$s3.' " + data.total + ")");
-              j$("a.no").attr("title", data.no + " ('.$s3.' " + data.total + ")");
+              j$("a.yes").attr("title", data.yes + " (' . $s3 . ' " + data.total + ")");
+              j$("a.no").attr("title", data.no + " (' . $s3 . ' " + data.total + ")");
               j$("#reptilo-vote .vote p.votes a.yes").removeAttr("href");
               j$("#reptilo-vote .vote p.votes a.no").removeAttr("href");
             }
           });
-        }
         return false;
       }
     });
   });
 </script>';
 
-    
+
     $code .= '<div style="clear:both;"></div>
     <div id="reptilo-vote">
       <div class="vote">
-        <p>'.$s1.'</p>
+        <p>' . $s1 . '</p>
         <div class="grade">
           <span class="large">' . $this->percent . '%</span>
-          '.$s2.'
+          ' . $s2 . '
         </div>
         <p class="votes">
-          <a class="vote yes" title="' . $this->yes . ' ('.$s3.' ' . $this->total . ')" href="#" tabindex="2">'.$s4.'</a>
-          <a class="vote no" title="' . $this->no . ' ('.$s3.' ' . $this->total . ')" href="#" tabindex="2">'.$s5.'</a>
+          <a class="vote yes" title="' . $this->yes . ' (' . $s3 . ' ' . $this->total . ')" href="#" tabindex="2">' . $s4 . '</a>
+          <a class="vote no" title="' . $this->no . ' (' . $s3 . ' ' . $this->total . ')" href="#" tabindex="2">' . $s5 . '</a>
         </p>
      </div>
   </div>';
-    
-  return $code;  
-  } 
+
+    return $code;
+  }
+
 }
-
-
 
 /**
  * Enqueue jQuery och CSS
@@ -207,13 +206,12 @@ function reptilo_load_scripts() {
   wp_deregister_script('jquery');
   wp_register_script('jquery', 'http://code.jquery.com/jquery-latest.min.js');
   wp_enqueue_script('jquery');
-  
-  wp_register_style( 'vote-style', plugins_url('style.css', __FILE__) );  
-  wp_enqueue_style( 'vote-style' );      
+
+  wp_register_style('vote-style', plugins_url('style.css', __FILE__));
+  wp_enqueue_style('vote-style');
 }
+
 add_action('wp_enqueue_scripts', 'reptilo_load_scripts');
-
-
 
 /**
  * Shortcode for [reptilo-vote]
@@ -221,14 +219,15 @@ add_action('wp_enqueue_scripts', 'reptilo_load_scripts');
  * @param type $atts
  * @return string 
  */
-function reptilo_display_vote( $atts ){
- $rv = new ReptiloVote();
- return $rv->includeCode();
+function reptilo_display_vote($atts) {
+  $rv = new ReptiloVote();
+  return $rv->includeCode();
 }
-add_shortcode( 'reptilo-vote', 'reptilo_display_vote' );
+
+add_shortcode('reptilo-vote', 'reptilo_display_vote');
 
 
 /**
  * enable language internationalization 
  */
-load_plugin_textdomain('reptilo-vote', false, basename( dirname( __FILE__ ) ) . '/languages' );
+load_plugin_textdomain('reptilo-vote', false, basename(dirname(__FILE__)) . '/languages');
