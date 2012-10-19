@@ -1,6 +1,7 @@
-#reptilo-vote {float: left;background-color: #F6F5F4;color: #93999D;margin: 10px 0 9px;padding: 20px;width: 600px;}
+#reptilo-vote {float: left;background-color: #F6F5F4;color: #93999D;margin: 10px 0 9px;padding: 20px;width:95%;}
 #reptilo-vote .vote {margin: 0;width: 360px;float: left;}
 #reptilo-vote .grade {float: right;font-size: 12px;line-height: 15px;padding: 0;width: 300px;}
+#reptilo-vote .vote p {margin-bottom: 20px;}
 #reptilo-vote .vote p.votes {float: left;font-size: 24px;font-weight: 700;width: 60px;}
 #reptilo-vote .vote p.votes .no{color: #B74242;}
 #reptilo-vote .vote a.no:hover{color: #8E3232;}
