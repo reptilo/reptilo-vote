@@ -141,9 +141,8 @@ class ReptiloVote {
     $actionFile = $pluginRoot . "/api/vote.php";
     $ajax_nonce = wp_create_nonce("reptilo-vote".$this->postId);
     $code = '<script type="text/javascript">
-  var j$ = jQuery.noConflict();
-  j$(document).ready(function(){
-    j$("a.vote").click(function(event) {
+  jQuery(document).ready(function(){
+    jQuery("a.vote").click(function(event) {
       event.preventDefault();
       var self = jQuery(this);
       if(!self.parent().hasClass("voted")){  //continue only if no class "voted"
@@ -164,12 +163,12 @@ class ReptiloVote {
             cache: false,
             success: function(data){
               console.log(data);
-              j$("p.votes").addClass("voted");
-              j$("span.large").html(data.percent + "%");
-              j$("a.yes").attr("title", data.yes + " (' . $s3 . ' " + data.total + ")");
-              j$("a.no").attr("title", data.no + " (' . $s3 . ' " + data.total + ")");
-              j$("#reptilo-vote .vote p.votes a.yes").removeAttr("href");
-              j$("#reptilo-vote .vote p.votes a.no").removeAttr("href");
+              jQuery("p.votes").addClass("voted");
+              jQuery("span.large").html(data.percent + "%");
+              jQuery("a.yes").attr("title", data.yes + " (' . $s3 . ' " + data.total + ")");
+              jQuery("a.no").attr("title", data.no + " (' . $s3 . ' " + data.total + ")");
+              jQuery("#reptilo-vote .vote p.votes a.yes").removeAttr("href");
+              jQuery("#reptilo-vote .vote p.votes a.no").removeAttr("href");
             }
           });
         return false;
