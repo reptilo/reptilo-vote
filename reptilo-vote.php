@@ -162,7 +162,7 @@ class ReptiloVote {
             data: data,
             cache: false,
             success: function(data){
-              console.log(data);
+              //console.log(data);
               jQuery("p.votes").addClass("voted");
               jQuery("span.large").html(data.percent + "%");
               jQuery("a.yes").attr("title", data.yes + " (' . $s3 . ' " + data.total + ")");
